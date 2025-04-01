@@ -17,7 +17,7 @@ AI Voice Assistance is a project designed to help users improve their English la
 ## Estimated Costs:
 
 - Its $43,35 on average per audio by month
-- ![AWS Calculator Example](https://calculator.aws/#/estimate?id=9020de2ec66545a6ed0ad1fd2e77076aec0ba6ed)
+- [AWS Calculator Example](https://calculator.aws/#/estimate?id=9020de2ec66545a6ed0ad1fd2e77076aec0ba6ed)
 
 ## Prerequisites
 
