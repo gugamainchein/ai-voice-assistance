@@ -23,6 +23,7 @@ provider:
         - arn:aws:s3:::${param:API_NAME}-${aws:region}-${aws:accountId}/*
         - arn:aws:s3:::${param:API_NAME}-${aws:region}-${aws:accountId}
         - arn:aws:transcribe:${aws:region}:${aws:accountId}:transcription-job/*
+        - !GetAtt ConversationTable.Arn
         - "*"
       Action:
         - "bedrock:InvokeModel"
@@ -33,9 +34,11 @@ provider:
         - "logs:CreateLogGroup"
         - "logs:CreateLogStream"
         - "logs:PutLogEvents"
+        - "dynamodb:*"
   environment:
     MODEL_ID: ${param:BEDROCK_INFERENCE_MODEL_ID}
     S3_BUCKET: ${param:API_NAME}-${aws:region}-${aws:accountId}
+    DYNAMODB_TABLE: !Ref ConversationTable
   apiGateway:
     minimumCompressionSize: 1024
 
@@ -45,3 +48,6 @@ package:
 
 functions:
   - ${file(./src/controllers/functions.yml)}
+
+resources:
+  - ${file(./src/infrastructure/resources.yml)}

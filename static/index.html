@@ -66,7 +66,13 @@
         url.searchParams.append("operation", operation);
 
         if (key) url.searchParams.append("key", key);
-        if (sessionId) url.searchParams.append("session_id", sessionId);
+        if (
+          sessionId &&
+          sessionId != null &&
+          sessionId != "null" &&
+          sessionId != "undefined"
+        )
+          url.searchParams.append("session_id", sessionId);
 
         const response = await fetch(url);
         const data = await response.json();
@@ -114,7 +120,11 @@
               await fetch(putUrl.url, {
                 method: "PUT",
                 body: blob,
-                headers: { "Content-Type": "audio/wav" },
+                headers: {
+                  "Content-Type": "audio/wav",
+                  "x-amz-tagging":
+                    "session_id=" + localStorage.getItem("sessionId"),
+                },
               });
 
               statusText.textContent = "⏳ Waiting response...";

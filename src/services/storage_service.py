@@ -15,10 +15,7 @@ class StorageService:
     def generate_signed_url(
         self, key: str, operation: str, audio_type="wav", session_id: str = None
     ):
-        tags = {"session_id": uuid.uuid4()}
-
-        if session_id != None:
-            tags["session_id"] = session_id
+        tags = {"session_id": session_id}
 
         if operation == "put_object":
             tagging_str = None
@@ -47,8 +44,8 @@ class StorageService:
                 ExpiresIn=900,
             )
 
-    def upload_file(self, key: str, file_path: str, tags: dict = None) -> None:
-        self._client.upload_file(file_path, self._bucket, key, Tagging=urlencode(tags))
+    def upload_file(self, key: str, file_path: str) -> None:
+        self._client.upload_file(file_path, self._bucket, key)
 
     def get_file(self, key: str) -> str:
         response = self._client.get_object(Bucket=self._bucket, Key=key)

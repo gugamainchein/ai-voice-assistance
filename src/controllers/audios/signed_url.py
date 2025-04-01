@@ -9,7 +9,7 @@ def handler(event: HttpRequest, context: None) -> HttpResponse:
     file_id = uuid.uuid4()
     key = f"user_audios/request_{file_id}.wav"
     audio_type = "wav"
-    session_id = None
+    session_id = uuid.uuid4()
 
     if "session_id" in event["queryStringParameters"]:
         session_id = event["queryStringParameters"]["session_id"]
@@ -23,8 +23,10 @@ def handler(event: HttpRequest, context: None) -> HttpResponse:
         key = f"ai_audios/{object_key}"
 
     operation = event["queryStringParameters"]["operation"]
-    url = storage_service.generate_signed_url(key, operation, audio_type, session_id)
+    url = storage_service.generate_signed_url(
+        key, operation, audio_type, str(session_id)
+    )
 
     return HttpResponse(
-        body={"url": url, "file_id": str(file_id), "session_id": session_id}
+        body={"url": url, "file_id": str(file_id), "session_id": str(session_id)}
     ).lambdaHttpResponse()
