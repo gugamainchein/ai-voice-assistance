@@ -7,6 +7,12 @@ from src.helpers.lambda_response import HttpResponse
 def handler(event: HttpRequest, context: None) -> HttpResponse:
     storage_service = StorageService()
     file_id = uuid.uuid4()
+    key = f"user_audios/request_{file_id}.wav"
+    audio_type = "wav"
+    session_id = None
+
+    if "session_id" in event["queryStringParameters"]:
+        session_id = event["queryStringParameters"]["session_id"]
 
     if (
         "key" in event["queryStringParameters"]
@@ -15,10 +21,10 @@ def handler(event: HttpRequest, context: None) -> HttpResponse:
         object_key = event["queryStringParameters"]["key"]
         audio_type = object_key.split(".")[-1]
         key = f"ai_audios/{object_key}"
-    else:
-        key = f"user_audios/request_{file_id}.wav"
-        audio_type = "wav"
 
     operation = event["queryStringParameters"]["operation"]
-    url = storage_service.generate_signed_url(key, operation, audio_type)
-    return HttpResponse(body={"url": url, "file_id": str(file_id)}).lambdaHttpResponse()
+    url = storage_service.generate_signed_url(key, operation, audio_type, session_id)
+
+    return HttpResponse(
+        body={"url": url, "file_id": str(file_id), "session_id": session_id}
+    ).lambdaHttpResponse()

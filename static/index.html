@@ -61,11 +61,16 @@
       let isRecording = false;
 
       async function getSignedUrl(operation, key = null) {
+        const sessionId = localStorage.getItem("sessionId");
         const url = new URL("/v1/signed/url", window.location.origin);
         url.searchParams.append("operation", operation);
+
         if (key) url.searchParams.append("key", key);
+        if (sessionId) url.searchParams.append("session_id", sessionId);
+
         const response = await fetch(url);
         const data = await response.json();
+        localStorage.setItem("sessionId", data.session_id);
         return data;
       }
 
