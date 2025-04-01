@@ -7,17 +7,17 @@ AI Voice Assistance is a project designed to help users improve their English la
 ## Features
 
 - **Interactive Voice Exercises**: Engage in spoken exercises that cover various aspects of English language learning.
-- **Real-Time Feedback**: Receive in few seconds assessments on pronunciation, vocabulary usage, and grammatical accuracy.
-- **AI Analyze**: Describe more
+- **Near Real-Time Feedback**: Receive in few seconds assessments on pronunciation, vocabulary usage, and grammatical accuracy.
+- **AI Analyze**: AI will analyze your vocabulary, providing powerful insights to improve your English.
 
 ## Architecture:
 
-Serverless
+![Architecture Diagram](./docs/ai-voice-assistance-architecture.png)
 
 ## Estimated Costs:
 
-- It`s $X on average per audio
-- AWS Calculator Example [https://google.com]
+- Its $43,35 on average per audio by month
+- ![AWS Calculator Example](https://calculator.aws/#/estimate?id=9020de2ec66545a6ed0ad1fd2e77076aec0ba6ed)
 
 ## Prerequisites
 
@@ -30,6 +30,7 @@ Before setting up the project, ensure you have the following installed:
 
 ## Project Structure
 
+```
 ai-voice-assistance/
 ├── src/ # Source code
 ├── static/ # Static files (e.g., HTML front-end file)
@@ -38,6 +39,7 @@ ai-voice-assistance/
 ├── README.md # Project documentation
 ├── deploy-example.sh # Example deployment script
 ├── serverless.yml # Serverless Framework config
+```
 
 ## Contributing
 
