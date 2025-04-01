@@ -1,0 +1,47 @@
+org: mainchein
+app: ai-audio-bot
+service: ai-audio-bot-rest-api
+
+provider:
+  name: aws
+  runtime: python3.12
+  timeout: 900
+  endpointType: EDGE
+  architecture: arm64
+  memorySize: 256
+  stackTags:
+    workload: "ai-audio-bot-rest-api"
+  deploymentBucket:
+    name: ${param:API_NAME}-${aws:region}-${aws:accountId}
+  iamRoleStatements:
+    - Effect: Allow
+      Resource:
+        - arn:aws:bedrock:${aws:region}::foundation-model/${param:BEDROCK_MODEL_ID}
+        - arn:aws:bedrock:us-east-2::foundation-model/${param:BEDROCK_MODEL_ID}
+        - arn:aws:bedrock:us-west-2::foundation-model/${param:BEDROCK_MODEL_ID}
+        - arn:aws:bedrock:${aws:region}:${aws:accountId}:inference-profile/${param:BEDROCK_INFERENCE_MODEL_ID}
+        - arn:aws:s3:::${param:API_NAME}-${aws:region}-${aws:accountId}/*
+        - arn:aws:s3:::${param:API_NAME}-${aws:region}-${aws:accountId}
+        - arn:aws:transcribe:${aws:region}:${aws:accountId}:transcription-job/*
+        - "*"
+      Action:
+        - "bedrock:InvokeModel"
+        - "polly:*"
+        - "transcribe:StartTranscriptionJob"
+        - "transcribe:GetTranscriptionJob"
+        - "s3:*"
+        - "logs:CreateLogGroup"
+        - "logs:CreateLogStream"
+        - "logs:PutLogEvents"
+  environment:
+    MODEL_ID: ${param:BEDROCK_INFERENCE_MODEL_ID}
+    S3_BUCKET: ${param:API_NAME}-${aws:region}-${aws:accountId}
+  apiGateway:
+    minimumCompressionSize: 1024
+
+package:
+  patterns:
+    - "!src/layers"
+
+functions:
+  - ${file(./src/controllers/functions.yml)}

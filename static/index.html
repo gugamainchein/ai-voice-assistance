@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI Voice Assistance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .pulse-ring {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border-radius: 9999px;
+        background-color: rgba(59, 130, 246, 0.4);
+        animation: pulse-ring 1.5s infinite;
+        z-index: -1;
+      }
+
+      @keyframes pulse-ring {
+        0% {
+          transform: scale(0.9);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1.6);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-zinc-900 text-white flex flex-col items-center justify-center min-h-screen font-sans relative"
+  >
+    <div class="text-center mb-24">
+      <h1 class="text-3xl font-semibold mb-2">Talk to AI</h1>
+      <p id="status" class="text-sm text-gray-400">
+        Tap the microphone to start
+      </p>
+    </div>
+
+    <div class="fixed bottom-10 flex items-center justify-center w-24 h-24">
+      <span id="pulseCircle" class="pulse-ring hidden"></span>
+      <button
+        id="recordBtn"
+        class="bg-blue-600 text-white p-5 text-2xl rounded-full shadow-lg hover:bg-blue-700 transition z-10"
+      >
+        🎤
+      </button>
+    </div>
+
+    <audio id="audioPlayer" class="hidden mt-4" controls></audio>
+
+    <script>
+      const recordBtn = document.getElementById("recordBtn");
+      const statusText = document.getElementById("status");
+      const audioPlayer = document.getElementById("audioPlayer");
+      const pulseCircle = document.getElementById("pulseCircle");
+
+      let mediaRecorder;
+      let chunks = [];
+      let isRecording = false;
+
+      async function getSignedUrl(operation, key = null) {
+        const url = new URL("/v1/signed/url", window.location.origin);
+        url.searchParams.append("operation", operation);
+        if (key) url.searchParams.append("key", key);
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+      }
+
+      async function waitForResponseAudio(getUrl, retries = 100, delay = 4000) {
+        for (let i = 0; i < retries; i++) {
+          const res = await fetch(getUrl.url, { method: "GET" });
+          if (res.ok) {
+            const audioBlob = await res.blob();
+            return URL.createObjectURL(audioBlob);
+          }
+          await new Promise((r) => setTimeout(r, delay));
+        }
+        throw new Error("Timeout waiting for response audio.");
+      }
+
+      recordBtn.onclick = async () => {
+        if (!isRecording) {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.start();
+          chunks = [];
+          isRecording = true;
+          pulseCircle.classList.remove("hidden");
+          statusText.textContent = "🎙️ Listening... Tap again to stop!";
+
+          mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+
+          mediaRecorder.onstop = async () => {
+            isRecording = false;
+            pulseCircle.classList.add("hidden");
+            statusText.textContent = "⏳ Sending audio...";
+
+            const blob = new Blob(chunks, { type: "audio/wav" });
+
+            try {
+              const putUrl = await getSignedUrl("put_object");
+              const responseKey = "response_" + putUrl.file_id;
+
+              await fetch(putUrl.url, {
+                method: "PUT",
+                body: blob,
+                headers: { "Content-Type": "audio/wav" },
+              });
+
+              statusText.textContent = "⏳ Waiting response...";
+
+              const getUrl = await getSignedUrl(
+                "get_object",
+                responseKey + ".mp3"
+              );
+              const audioUrl = await waitForResponseAudio(getUrl);
+              audioPlayer.src = audioUrl;
+              audioPlayer.classList.remove("hidden");
+              audioPlayer.play();
+
+              statusText.textContent =
+                "✅ The answer is now ready. Tap again to continue!";
+            } catch (error) {
+              console.error(error);
+              statusText.textContent =
+                "❌ Error on audio processing. Try again later.";
+            }
+          };
+        } else {
+          mediaRecorder.stop();
+        }
+      };
+    </script>
+  </body>
+</html>

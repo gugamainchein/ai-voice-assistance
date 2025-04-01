@@ -1,0 +1,41 @@
+static-files:
+  handler: src/controllers/frontend/static_files.handler
+  timeout: 29
+  events:
+    - http:
+        path: /frontend
+        method: get
+        cors: true
+
+signed-url:
+  handler: src/controllers/audios/signed_url.handler
+  timeout: 29
+  events:
+    - http:
+        path: /signed/url
+        method: get
+        cors: true
+
+transcribe-user-audios:
+  handler: src/controllers/audios/transcribe.handler
+  timeout: 900
+  events:
+    - s3:
+        bucket: ${param:API_NAME}-${aws:region}-${aws:accountId}
+        event: s3:ObjectCreated:*
+        existing: true
+        rules:
+          - prefix: user_audios/
+          - suffix: .wav
+
+ai-text-to-voice:
+  handler: src/controllers/audios/text_voice.handler
+  timeout: 900
+  events:
+    - s3:
+        bucket: ${param:API_NAME}-${aws:region}-${aws:accountId}
+        event: s3:ObjectCreated:*
+        existing: true
+        rules:
+          - prefix: user_audios/
+          - suffix: .json
