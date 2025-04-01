@@ -1,8 +1,8 @@
 export API_NAME="ai-audio-bot-rest-api"
 export AWS_DEFAULT_REGION=$(aws configure get region)
 export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-export BEDROCK_MODEL_ID="anthropic.claude-3-sonnet-20240229-v1:0"
-export BEDROCK_INFERENCE_MODEL_ID="us.anthropic.claude-3-sonnet-20240229-v1:0"
+export BEDROCK_MODEL_ID="amazon.nova-micro-v1:0"
+export BEDROCK_INFERENCE_MODEL_ID="us.amazon.nova-micro-v1:0"
 
 if ! aws s3 ls s3://$API_NAME-$AWS_DEFAULT_REGION-$ACCOUNT_ID; then
     aws s3 mb s3://$API_NAME-$AWS_DEFAULT_REGION-$ACCOUNT_ID
