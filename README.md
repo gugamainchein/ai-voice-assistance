@@ -16,8 +16,14 @@ AI Voice Assistance is a project designed to help users improve their English la
 
 ## Estimated Costs:
 
-- Its $43,35 on average per audio by month
-- [AWS Calculator Example](https://calculator.aws/#/estimate?id=9020de2ec66545a6ed0ad1fd2e77076aec0ba6ed)
+- Amazon S3 | 1 GB storage, 5K PUT/GET | ~$0,14
+- Amazon Transcribe | 10 hours/month | ~$0,24
+- Amazon Bedrock (Nova Micro) | 500K input/output tokens | ~$0,09
+- Amazon Polly (Generative) | 10 hours of audio | ~$0,00
+- Lambda (1M requests + 5000 ms + 128 MB) | ~$3.00
+- API Gateway | 1M calls/month | ~$3.50
+
+[💡 Total Estimated Monthly Cost: ~$9,56](https://calculator.aws/#/estimate?id=b2c5d8ad202d2a697977cf9d0c45b8a6dda13813)
 
 ## Prerequisites
 
